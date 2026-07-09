@@ -1,10 +1,8 @@
-const express = require('express');
+const http = require('http');
 
-const app = express();
 const port = process.env.PORT || 8080;
 
-app.get('/', (req, res) => {
-  res.send(`<!doctype html>
+const homePage = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -44,16 +42,22 @@ app.get('/', (req, res) => {
   <body>
     <main>
       <h1>Hello from Node.js on Azure App Service</h1>
-      <p>This basic Express web app is ready to run on Azure App Service for Linux.</p>
+      <p>This basic Node.js web app is ready to run on Azure App Service for Linux.</p>
     </main>
   </body>
-</html>`);
+</html>`;
+
+const server = http.createServer((req, res) => {
+  if (req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: 'ok' }));
+    return;
+  }
+
+  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+  res.end(homePage);
 });
 
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok' });
-});
-
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
